@@ -4,18 +4,23 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/forter/cloudtrailbeat/config"
 )
 
 // Cloudtrailbeat configuration.
 type Cloudtrailbeat struct {
-	done   chan struct{}
-	config config.Config
-	client beat.Client
+	done       chan struct{}
+	config     config.Config
+	client     beat.Client
+	sqs        *sqs.SQS
+	downloader *s3manager.Downloader
 }
 
 // New creates an instance of cloudtrailbeat.
@@ -24,10 +29,15 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
-
+	sess := session.Must(session.NewSession())
+	svc := sqs.New(sess)
+	s3Svc := s3.New(sess)
+	downloader := s3manager.NewDownloaderWithClient(s3Svc)
 	bt := &Cloudtrailbeat{
-		done:   make(chan struct{}),
-		config: c,
+		done:       make(chan struct{}),
+		config:     c,
+		sqs:        svc,
+		downloader: downloader,
 	}
 	return bt, nil
 }
@@ -43,7 +53,6 @@ func (bt *Cloudtrailbeat) Run(b *beat.Beat) error {
 	}
 
 	ticker := time.NewTicker(bt.config.Period)
-	counter := 1
 	for {
 		select {
 		case <-bt.done:
@@ -51,16 +60,25 @@ func (bt *Cloudtrailbeat) Run(b *beat.Beat) error {
 		case <-ticker.C:
 		}
 
-		event := beat.Event{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"type":    b.Info.Name,
-				"counter": counter,
-			},
+		// poll sqs queue
+		events, err := pullEvents(bt)
+		if err != nil {
+			logp.Err("Failed to pull events from SQS", err)
 		}
-		bt.client.Publish(event)
-		logp.Info("Event sent")
-		counter++
+		fields := common.MapStr{}
+		fields["type"] = b.Info.Name
+		for _, e := range events {
+			values, err := e.ToCommonMap()
+			if err != nil {
+				logp.Err("Shittt")
+			}
+			event := beat.Event{
+				Timestamp: time.Now(),
+				Fields:    values,
+			}
+			bt.client.Publish(event)
+			logp.Info("Event sent")
+		}
 	}
 }
 

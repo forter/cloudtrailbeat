@@ -7,8 +7,10 @@ import "time"
 
 type Config struct {
 	Period time.Duration `config:"period"`
+	SQSUrl string        `config:"sqs_url"`
 }
 
 var DefaultConfig = Config{
 	Period: 1 * time.Second,
+	SQSUrl: "",
 }
