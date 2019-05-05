@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Cloudtrailbeat
 
 Welcome to Cloudtrailbeat.
@@ -114,3 +115,7 @@ make release
 ```
 
 This will fetch and create all images required for the build process. The whole process to finish can take several minutes.
+=======
+# cloudtrailbeat
+An Elastic beat for cloudtrail w/ S3 -> SNS -> SQS
+>>>>>>> 11dd3844af290305ab269a31907eb91497b8b2e4
