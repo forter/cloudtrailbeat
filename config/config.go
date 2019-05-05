@@ -6,11 +6,11 @@ package config
 import "time"
 
 type Config struct {
-	Period time.Duration `config:"period"`
-	SQSUrl string        `config:"sqs_url"`
+	Period       time.Duration `config:"period"`
+	SQSQueueName string        `config:"sqs_queue_name"`
 }
 
 var DefaultConfig = Config{
-	Period: 1 * time.Second,
-	SQSUrl: "",
+	Period:       1 * time.Second,
+	SQSQueueName: "",
 }

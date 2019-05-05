@@ -31,6 +31,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 	sess := session.Must(session.NewSession())
 	svc := sqs.New(sess)
+	queueURL := sqs.Get
 	s3Svc := s3.New(sess)
 	downloader := s3manager.NewDownloaderWithClient(s3Svc)
 	bt := &Cloudtrailbeat{
