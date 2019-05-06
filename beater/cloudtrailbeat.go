@@ -34,8 +34,10 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	sess := session.Must(session.NewSession())
 	svc := sqs.New(sess)
 	queueURLResp, err := svc.GetQueueUrl(&sqs.GetQueueUrlInput{
-		QueueName: aws.String(c.SQSQueueName),
+		QueueName:              aws.String(c.SQSQueueName),
+		QueueOwnerAWSAccountId: aws.String(c.AccountID),
 	})
+	logp.Info("SQS URL %s", queueURLResp.QueueUrl)
 	if err != nil {
 		logp.Err("Could not get Queue Name")
 		return nil, err
@@ -46,7 +48,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		done:       make(chan struct{}),
 		config:     c,
 		sqs:        svc,
-		queueURL:   queueURLResp.String(),
+		queueURL:   *queueURLResp.QueueUrl,
 		downloader: downloader,
 	}
 	return bt, nil
@@ -78,9 +80,17 @@ func (bt *Cloudtrailbeat) Run(b *beat.Beat) error {
 		fields := common.MapStr{}
 		fields["type"] = b.Info.Name
 		for _, e := range events {
+			/*
+				identity, err := e.UserIdentity.ToCommonMap()
+				if err != nil {
+					logp.Err("Could not convert user idenitty into commonmap")
+					return err
+				}
+			*/
 			values, err := e.ToCommonMap()
 			if err != nil {
-				logp.Err("Shittt")
+				logp.Err("Could not convert cloudtrail event into common map")
+				return err
 			}
 			event := beat.Event{
 				Timestamp: time.Now(),

@@ -15,6 +15,7 @@ import (
 )
 
 func pullEvents(bt *Cloudtrailbeat) ([]CloudtrailRecord, error) {
+	logp.Info("QUEUE URL inside of pullEvents", bt.queueURL)
 	result, err := bt.sqs.ReceiveMessage(&sqs.ReceiveMessageInput{
 		QueueUrl:            aws.String(bt.queueURL),
 		MaxNumberOfMessages: aws.Int64(10),
