@@ -1,0 +1,19 @@
+[[constraint]]
+name = "github.com/elastic/beats"
+branch = "master"
+
+[[constraint]]
+name = "github.com/aws/aws-lambda-go"
+branch = "master"
+
+[[constraint]]
+name = "github.com/aws/aws-sdk-go"
+branch = "master"
+
+[[constraint]]
+name = "github.com/mitchellh/mapstructure"
+branch = "master"
+
+[[constraint]]
+name = "github.com/magefile/mage"
+branch = "master"

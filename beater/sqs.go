@@ -16,7 +16,7 @@ import (
 
 func pullEvents(bt *Cloudtrailbeat) ([]CloudtrailRecord, error) {
 	result, err := bt.sqs.ReceiveMessage(&sqs.ReceiveMessageInput{
-		QueueUrl:            aws.String(bt.config.SQSUrl),
+		QueueUrl:            aws.String(bt.queueURL),
 		MaxNumberOfMessages: aws.Int64(10),
 		WaitTimeSeconds:     aws.Int64(0),
 	})
@@ -32,7 +32,7 @@ func pullEvents(bt *Cloudtrailbeat) ([]CloudtrailRecord, error) {
 		body := message.Body
 		handle := message.ReceiptHandle
 		_, err := bt.sqs.DeleteMessage(&sqs.DeleteMessageInput{
-			QueueUrl:      &bt.config.SQSUrl,
+			QueueUrl:      aws.String(bt.queueURL),
 			ReceiptHandle: handle,
 		})
 

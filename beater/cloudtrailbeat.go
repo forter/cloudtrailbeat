@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -20,6 +21,7 @@ type Cloudtrailbeat struct {
 	config     config.Config
 	client     beat.Client
 	sqs        *sqs.SQS
+	queueURL   string
 	downloader *s3manager.Downloader
 }
 
@@ -31,13 +33,20 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 	sess := session.Must(session.NewSession())
 	svc := sqs.New(sess)
-	queueURL := sqs.Get
+	queueURLResp, err := svc.GetQueueUrl(&sqs.GetQueueUrlInput{
+		QueueName: aws.String(c.SQSQueueName),
+	})
+	if err != nil {
+		logp.Err("Could not get Queue Name")
+		return nil, err
+	}
 	s3Svc := s3.New(sess)
 	downloader := s3manager.NewDownloaderWithClient(s3Svc)
 	bt := &Cloudtrailbeat{
 		done:       make(chan struct{}),
 		config:     c,
 		sqs:        svc,
+		queueURL:   queueURLResp.String(),
 		downloader: downloader,
 	}
 	return bt, nil
