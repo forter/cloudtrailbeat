@@ -12,8 +12,11 @@ RUN make
 RUN chmod +x cloudtrailbeat
 # ---
 
-FROM golang:stretch
+FROM ubuntu:latest
 COPY --from=builder /go/src/github.com/forter/cloudtrailbeat/cloudtrailbeat /bin/cloudtrailbeat
+RUN apt-get -y update \
+ && apt-get -y install ca-certificates dumb-init curl \
+ && update-ca-certificates
 VOLUME  /config/beat.yml
 ENTRYPOINT [ "/bin/cloudtrailbeat" ]
-CMD [ "-c /config/beat.yml" ]
+CMD [ "-e -c /config/beat.yml" ]
