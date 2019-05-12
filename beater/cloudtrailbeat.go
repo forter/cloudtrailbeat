@@ -3,7 +3,7 @@ package beater
 import (
 	"fmt"
 	"time"
-
+	
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	
 	"github.com/forter/cloudtrailbeat/config"
 )
 
@@ -23,6 +24,7 @@ type Cloudtrailbeat struct {
 	sqs        *sqs.SQS
 	queueURL   string
 	downloader *s3manager.Downloader
+	logger      logp.Logger
 }
 
 // New creates an instance of cloudtrailbeat.
@@ -33,13 +35,14 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 	sess := session.Must(session.NewSession())
 	svc := sqs.New(sess)
+	logger := logp.NewLogger("internal")
 	queueURLResp, err := svc.GetQueueUrl(&sqs.GetQueueUrlInput{
 		QueueName:              aws.String(c.SQSQueueName),
 		QueueOwnerAWSAccountId: aws.String(c.AccountID),
 	})
-	logp.Info("SQS URL %s", queueURLResp.QueueUrl)
+	logger.Infof("SQS URL %s", queueURLResp.QueueUrl)
 	if err != nil {
-		logp.Err("Could not get Queue Name")
+		logger.Error("Could not get Queue Name")
 		return nil, err
 	}
 	s3Svc := s3.New(sess)
@@ -50,13 +53,14 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		sqs:        svc,
 		queueURL:   *queueURLResp.QueueUrl,
 		downloader: downloader,
+		logger: *logger,
 	}
 	return bt, nil
 }
 
 // Run starts cloudtrailbeat.
 func (bt *Cloudtrailbeat) Run(b *beat.Beat) error {
-	logp.Info("cloudtrailbeat is running! Hit CTRL-C to stop it.")
+	bt.logger.Info("cloudtrailbeat is running! Hit CTRL-C to stop it.")
 
 	var err error
 	bt.client, err = b.Publisher.Connect()
@@ -75,7 +79,7 @@ func (bt *Cloudtrailbeat) Run(b *beat.Beat) error {
 		// poll sqs queue
 		events, err := pullEvents(bt)
 		if err != nil {
-			logp.Err("Failed to pull events from SQS", err)
+			bt.logger.Error("Failed to pull events from SQS", err)
 		}
 		fields := common.MapStr{}
 		fields["type"] = b.Info.Name
@@ -89,7 +93,7 @@ func (bt *Cloudtrailbeat) Run(b *beat.Beat) error {
 			*/
 			values, err := e.ToCommonMap()
 			if err != nil {
-				logp.Err("Could not convert cloudtrail event into common map")
+				bt.logger.Error("Could not convert cloudtrail event into common map")
 				return err
 			}
 			event := beat.Event{
@@ -97,7 +101,7 @@ func (bt *Cloudtrailbeat) Run(b *beat.Beat) error {
 				Fields:    values,
 			}
 			bt.client.Publish(event)
-			logp.Info("Event sent")
+			bt.logger.Info("Event sent")
 		}
 	}
 }

@@ -1,2 +1,3 @@
 cloudtrailbeat:
-  period: 1s
+  period: 10s
+  account_id: 123456789

@@ -5,4 +5,7 @@
 cloudtrailbeat:
   # Defines how often an event is sent to the output
   period: 1s
-  sqs_url: https://sqs.amazonaws.com/test-queue
+  # Defines name of the SQS queue to read SNS events from
+  sqs_queue_name: test-queue
+  # AWS Account ID associated with SQS queue
+  account_id: 123456789

@@ -1,9 +1,116 @@
+# https://raw.githubusercontent.com/awsdocs/aws-cloudtrail-user-guide/master/doc_source/cloudtrail-event-reference-record-contents.md
 - key: cloudtrailbeat
-  title: cloudtrailbeat
-  description:
+  title: Cloudtrailbeat Event Data
+  description: >
+    Contains events from AWS Cloudtrail
   fields:
-    - name: counter
-      type: long
+    - name: eventTime
+      type: keyword
       required: true
       description: >
-        PLEASE UPDATE DOCUMENTATION
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: eventVersion
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: eventSource
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: eventName
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: awsRegion
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: sourceIPAddress
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: userAgent
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: errorCode
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: errorMessage
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: requestParameters
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: responseElements
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: additionalEventData
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: equestID
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: eventID
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: eventType
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: apiVersion
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: managementEvent
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: readOnly
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: resources
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: recipientAccountId
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: serviceEventDetails
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
+    - name: sharedEventID
+      type: keyword
+      required: true
+      description: >
+        https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference.html
